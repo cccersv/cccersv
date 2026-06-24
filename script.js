@@ -1,0 +1,142 @@
+let reservations = JSON.parse(localStorage.getItem('ccc_reservations')) || [];
+let activeSelectedFacility = null;
+let calendarCurrentDate = new Date();
+
+const schoolHoursOptions = ["07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM", "06:00 PM", "07:00 PM"];
+
+document.addEventListener('DOMContentLoaded', () => {
+    populateTimeDropdowns();
+    renderInteractiveCalendarGrid();
+
+    // Event Listeners
+    document.getElementById('navFacilities').addEventListener('click', () => switchView('facilities'));
+    document.getElementById('navContact').addEventListener('click', () => switchView('contact'));
+    document.getElementById('closeEditModal').addEventListener('click', () => document.getElementById('editEventModal').style.display = 'none');
+    
+    document.getElementById('bookingForm').addEventListener('submit', handleNewBooking);
+    document.getElementById('editEventForm').addEventListener('submit', handleEditBooking);
+    document.getElementById('deleteEventBtn').addEventListener('click', handleDeleteBooking);
+    
+    document.getElementById('prevMonthBtn').addEventListener('click', () => { calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() - 1); renderInteractiveCalendarGrid(); });
+    document.getElementById('nextMonthBtn').addEventListener('click', () => { calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + 1); renderInteractiveCalendarGrid(); });
+});
+
+function handleNewBooking(e) {
+    e.preventDefault();
+    const newRes = {
+        id: Date.now(),
+        facility: activeSelectedFacility,
+        date: document.getElementById('bookingDate').value,
+        from: document.getElementById('bookingTimeFrom').value,
+        to: document.getElementById('bookingTimeTo').value,
+        purpose: document.getElementById('bookingPurpose').value
+    };
+
+    reservations.push(newRes);
+    saveData();
+    document.getElementById('bookingForm').reset();
+    alert("Reservation saved!");
+}
+
+function handleEditBooking(e) {
+    e.preventDefault();
+    const id = parseInt(document.getElementById('editEventId').value);
+    const index = reservations.findIndex(r => r.id === id);
+    
+    reservations[index].from = document.getElementById('editEventTimeFrom').value;
+    reservations[index].to = document.getElementById('editEventTimeTo').value;
+    reservations[index].purpose = document.getElementById('editEventPurpose').value;
+    
+    saveData();
+    document.getElementById('editEventModal').style.display = 'none';
+}
+
+function handleDeleteBooking() {
+    const id = parseInt(document.getElementById('editEventId').value);
+    reservations = reservations.filter(r => r.id !== id);
+    saveData();
+    document.getElementById('editEventModal').style.display = 'none';
+}
+
+function saveData() {
+    localStorage.setItem('ccc_reservations', JSON.stringify(reservations));
+    renderInteractiveCalendarGrid();
+}
+
+function selectFacility(facilityName) {
+    activeSelectedFacility = facilityName;
+    document.getElementById('reservationBoxTitle').textContent = `Booking: ${facilityName}`;
+    document.getElementById('bookingForm').classList.remove('hidden');
+    document.getElementById('bookingDate').value = new Date().toISOString().split('T')[0];
+}
+
+function renderInteractiveCalendarGrid() {
+    const container = document.getElementById('calendarGridContainer');
+    const displayLabel = document.getElementById('calendarMonthYearDisplay');
+    const year = calendarCurrentDate.getFullYear();
+    const month = calendarCurrentDate.getMonth();
+    
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    displayLabel.textContent = `${monthNames[month]} ${year}`;
+
+    // Grid rendering 
+    let gridHTML = `<div class="calendar-grid">`;
+    const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    weekdays.forEach(day => { gridHTML += `<div class="calendar-day-name">${day}</div>`; });
+    
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalMonthDays = new Date(year, month + 1, 0).getDate();
+
+    // Fill days
+    for(let i = 0; i < firstDayIndex; i++) gridHTML += `<div class="calendar-day-cell"></div>`;
+    
+    for(let day = 1; day <= totalMonthDays; day++) {
+        const d = day < 10 ? '0'+day : day;
+        const m = (month+1) < 10 ? '0'+(month+1) : (month+1);
+        const dateStr = `${year}-${m}-${d}`;
+        
+        gridHTML += `<div class="calendar-day-cell">
+            <div class="calendar-day-number">${day}</div>
+            <div id="events-${dateStr}"></div>
+        </div>`;
+    }
+    gridHTML += `</div>`;
+    container.innerHTML = gridHTML;
+
+    // Populate events
+    reservations.forEach(res => {
+        const target = document.getElementById(`events-${res.date}`);
+        if(target) {
+            const el = document.createElement('div');
+            el.className = 'calendar-event-badge';
+            el.textContent = `[${res.facility}] ${res.purpose}`;
+            el.onclick = () => openEditModal(res);
+            target.appendChild(el);
+        }
+    });
+}
+
+function openEditModal(res) {
+    document.getElementById('editEventId').value = res.id;
+    document.getElementById('editEventFacility').value = res.facility;
+    document.getElementById('editEventTimeFrom').value = res.from;
+    document.getElementById('editEventTimeTo').value = res.to;
+    document.getElementById('editEventPurpose').value = res.purpose;
+    document.getElementById('editEventModal').style.display = 'flex';
+}
+
+function switchView(viewName) {
+    document.getElementById('facilitiesView').classList.toggle('hidden', viewName !== 'facilities');
+    document.getElementById('contactView').classList.toggle('hidden', viewName !== 'contact');
+}
+
+function populateTimeDropdowns() {
+    const selects = document.querySelectorAll('.time-select');
+    selects.forEach(s => {
+        schoolHoursOptions.forEach(hr => {
+            let opt = document.createElement('option');
+            opt.value = hr; opt.textContent = hr;
+            s.appendChild(opt);
+        });
+    });
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cainta Catholic College - E-Reservation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="menu-title">Menu</div>
+            <nav class="nav-links">
+                <a href="#" class="active" id="navFacilities">Facilities</a>
+                <a href="https://www.caintacatholiccollege.edu.ph/about-us/" target="_blank" rel="noopener noreferrer">About Us</a>
+                <a href="#" id="navContact">Contact Us</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="hero-header">
+                <h1>Cainta Catholic College</h1>
+                <h2>E-Reservation of Facilities</h2>
+            </header>
+
+            <div id="facilitiesView" class="view-section">
+                <section class="facilities-section">
+					<div class="facility-card card-auditorium" onclick="selectFacility('Auditorium')">
+						<h3>Auditorium</h3>
+					</div>
+					<div class="facility-card card-library" onclick="selectFacility('Library')">
+						<h3>Library</h3>
+					</div>
+					<div class="facility-card card-gym" onclick="selectFacility('Gymnasium')">
+						<h3>Gymnasium</h3>
+					</div>
+					<div class="facility-card card-fc" onclick="selectFacility('Function Room')">
+						<h3>Function Room</h3>
+					</div>
+				</section>
+
+                <section id="reservationControlBox" class="calendar-section style-container">
+                    <div class="calendar-box large-box">
+                        <h3 id="reservationBoxTitle">Select a facility above to book</h3>
+                        
+                        <form id="bookingForm" class="auth-form hidden">
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="bookingDate">Date</label>
+                                    <input type="date" id="bookingDate" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="bookingTimeFrom">From</label>
+                                    <select id="bookingTimeFrom" class="time-select" required></select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="bookingTimeTo">To</label>
+                                    <select id="bookingTimeTo" class="time-select" required></select>
+                                </div>
+                                <div class="input-group full-width">
+                                    <label for="bookingPurpose">Purpose / Event Name</label>
+                                    <input type="text" id="bookingPurpose" placeholder="e.g. Department Meeting" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="submit-btn">Confirm Reservation</button>
+                        </form>
+                    </div>
+                </section>
+
+                <section class="calendar-section">
+                    <div class="calendar-box">
+                        <div class="calendar-header-ctrl">
+                            <button id="prevMonthBtn" class="calendar-ctrl-btn">&lt;</button>
+                            <h3 id="calendarMonthYearDisplay">June 2026</h3>
+                            <button id="nextMonthBtn" class="calendar-ctrl-btn">&gt;</button>
+                        </div>
+                        <div id="calendarGridContainer"></div>
+                    </div>
+                </section>
+            </div>
+
+           <div id="contactView" class="view-section hidden">
+    <div class="contact-panel">
+        <h2 class="contact-title">GENERAL CONTACT INFORMATION</h2>
+        <hr class="gold-divider">
+        
+        <div class="contact-grid-layout">
+            <!-- Address Section -->
+            <div class="contact-section">
+                <h3>Address</h3>
+                <p>A. Bonifacio Ave., Poblacion</p>
+                <p>Cainta, Rizal</p>
+                <p>+632 (08) 643 2000</p>
+                <p><a href="mailto:ccc@caintacatholiccollege.edu.ph" style="color: #c99700;">ccc@caintacatholiccollege.edu.ph</a></p>
+            </div>
+            
+            <!-- Directory Section -->
+            <div class="contact-section">
+                <h3>Directory</h3>
+                <ul class="directory-list-dark">
+                    <li>Administration Office – (8) 655 4078</li>
+                    <li>Finance Office – (8) 655 6127</li>
+                    <li>Human Resource Mngt. Dept. – (8) 655 2965</li>
+                    <li>Registrar’s Office – (8) 643 2000</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+        </main>
+    </div>
+
+    <div id="editEventModal" class="modal">
+        <div class="modal-content edit-modal-border">
+            <span class="close-modal" id="closeEditModal">&times;</span>
+            <h3>Manage Reservation</h3>
+            <form id="editEventForm" class="auth-form">
+                <input type="hidden" id="editEventId">
+                <div class="input-group">
+                    <label>Facility</label>
+                    <input type="text" id="editEventFacility" readonly class="readonly-input">
+                </div>
+                <div class="form-grid split-two">
+                    <div class="input-group">
+                        <label>From</label>
+                        <select id="editEventTimeFrom" class="time-select"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>To</label>
+                        <select id="editEventTimeTo" class="time-select"></select>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Purpose</label>
+                    <input type="text" id="editEventPurpose" required>
+                </div>
+                <div class="modal-btn-group">
+                    <button type="submit" class="submit-btn save-btn">Save</button>
+                    <button type="button" id="deleteEventBtn" class="submit-btn cancel-btn">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
